@@ -37,7 +37,8 @@ class DownloadFile(object):
             downloader.resume()
     """        
     
-    def __init__(self, url, localFileName=None, auth=None, timeout=120.0, autoretry=False, retries=5):
+    def __init__(self, url, localFileName=None, auth=None, timeout=120.0, autoretry=False, retries=5,
+                 fast_start=False):
         """Note that auth argument expects a tuple, ('username','password')"""
         self.url = url
         self.urlFileName = None
@@ -48,18 +49,23 @@ class DownloadFile(object):
         self.auth = auth
         self.timeout = timeout
         self.retries = retries
+        self.fast_start = fast_start
         self.curretry = 0
         self.cur = 0
-        try:
-            self.urlFilesize = self.getUrlFileSize()
-        except urllib2.HTTPError:
-            self.urlFilesize = None
+        if not self.fast_start:
+            try:
+                self.urlFilesize = self.getUrlFileSize()
+            except urllib2.HTTPError:
+                self.urlFilesize = None
+        else:
+            self.urlFilesize
         if not self.localFileName: #if no filename given pulls filename from the url
             self.localFileName = self.getUrlFilename(self.url)
         
     def __downloadFile__(self, urlObj, fileObj, callBack=None):
         """starts the download loop"""
-        self.fileSize = self.getUrlFileSize()
+        if not self.fast_start:
+            self.fileSize = self.getUrlFileSize()
         while 1:
             try:
                 data = urlObj.read(8192)
