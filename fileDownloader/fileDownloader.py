@@ -107,6 +107,15 @@ class DownloadFile(object):
         ftpObj = ftped.ftp_open(req)
         return ftpObj
         
+    def __startHttpPartial__(self, startPos, endPos, callBack=None):
+        f = open(self.localFileName , "wb")
+        if self.auth:
+            self.__authHttp__()
+        req = urllib2.Request(self.url)
+        req.headers['Range'] = 'bytes=%s-%s' % (startPos, endPos)
+        urllib2Obj = urllib2.urlopen(req, timeout=self.timeout)
+        self.__downloadFile__(urllib2Obj, f, callBack=callBack)
+    
     def __startHttpResume__(self, restart=None, callBack=None):
         """starts to resume HTTP"""
         curSize = self.getLocalFileSize()
@@ -220,3 +229,12 @@ class DownloadFile(object):
         elif type == 'ftp':
             self.__startFtpResume__()
             
+    def partialDownload(self, startPos, endPos, callBack=None):
+        """downloads a piece of a file, only supports HTTP"""
+        if self.type == 'http':
+            self.__startHttpPartial__(startPos, endPos, callBack=callBack)
+        elif self.type == 'ftp':
+            raise FileDownloaderError("Partial download doesn't support ftp.")
+            
+class FileDownloaderError(Exception):
+    pass
