@@ -23,6 +23,8 @@ class DownloadFile(object):
     #####
     If a non-standard port is needed just include it in the url (http://example.com:7632).
     
+    #NOTE: S3 requires s3.amazonaws.com/hanstest/s3.py.
+    
     Basic usage:
         Simple
             downloader = fileDownloader.DownloadFile('http://example.com/file.zip')
