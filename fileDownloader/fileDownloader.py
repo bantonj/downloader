@@ -8,6 +8,7 @@ import urlparse
 import urllib
 import sys
 import socket
+import fd_s3
  
 version = "0.4.0"
 
@@ -37,19 +38,26 @@ class DownloadFile(object):
             downloader.resume()
     """        
     
-    def __init__(self, url, localFileName=None, auth=None, timeout=120.0, autoretry=False, retries=5,
-                 fast_start=False):
+    def __init__(self, url=None, localFileName=None, auth=None, timeout=120.0, autoretry=False, retries=5,
+                 fast_start=False, aws_key=None, aws_secret_key=None, aws_bucket_name=None, aws_file_key=None):
         """Note that auth argument expects a tuple, ('username','password')"""
         self.url = url
         self.urlFileName = None
         self.progress = 0
         self.fileSize = None
         self.localFileName = localFileName
-        self.type = self.getType()
+        if aws_key:
+            self.type = 's3'
+        else:
+            self.type = self.getType()
         self.auth = auth
         self.timeout = timeout
         self.retries = retries
         self.fast_start = fast_start
+        self.aws_key = aws_key
+        self.aws_secret_key = aws_secret_key
+        self.aws_bucket_name = aws_bucket_name
+        self.aws_file_key = aws_file_key
         self.curretry = 0
         self.cur = 0
         if not self.fast_start:
@@ -58,7 +66,7 @@ class DownloadFile(object):
             except urllib2.HTTPError:
                 self.urlFilesize = None
         else:
-            self.urlFilesize
+            self.urlFilesize = None
         if not self.localFileName: #if no filename given pulls filename from the url
             self.localFileName = self.getUrlFilename(self.url)
         
@@ -242,5 +250,53 @@ class DownloadFile(object):
         elif self.type == 'ftp':
             raise FileDownloaderError("Partial download doesn't support ftp.")
             
+    #S3 Methods
+    def download_s3(self, callBack=None):
+        """downloads s3 objects"""
+        self.curretry = 0
+        self.cur = 0
+        f = open(self.localFileName , "wb")
+        s3obj = fd_s3.S3HttpLib(self.aws_key, self.aws_secret_key)
+        conn, path, headers = s3obj._make_request('GET', self.aws_bucket_name, self.aws_file_key, {})
+        conn.request("GET", path, headers=headers)
+        r1 = conn.getresponse()
+        if r1.status == 404:
+            raise FileDownloaderError(404)
+        self.__downloadFile__(r1, f, callBack=callBack)
+        return True
+    
+        
+    def download_s3_partial(self, startPos, endPos, callBack=None):
+        """downloads s3 objects"""
+        self.curretry = 0
+        self.cur = 0
+        f = open(self.localFileName , "wb")
+        s3obj = fd_s3.S3HttpLib(self.aws_key, self.aws_secret_key)
+        conn, path, headers = s3obj._make_request('GET', self.aws_bucket_name, self.aws_file_key, {})
+        headers['Range'] = 'bytes=%s-%s' % (startPos, endPos)
+        conn.request("GET", path, headers=headers)
+        r1 = conn.getresponse()
+        if r1.status == 404:
+            raise FileDownloaderError(404)
+        self.__downloadFile__(r1, f, callBack=callBack)
+        return True
+    
+    def resume_s3(self, callBack=None):
+        """downloads s3 objects"""
+        self.curretry = 0
+        self.cur = 0
+        curSize = self.getLocalFileSize()
+        f = open(self.localFileName , "ab")
+        s3obj = fd_s3.S3HttpLib(self.aws_key, self.aws_secret_key)
+        conn, path, headers = s3obj._make_request('GET', self.aws_bucket_name, self.aws_file_key, {})
+        headers['Range'] = 'bytes=%s-%s' % (curSize, self.getUrlFileSize())
+        conn.request("GET", path, headers=headers)
+        r1 = conn.getresponse()
+        if r1.status == 404:
+            raise FileDownloaderError(404)
+        self.__downloadFile__(r1, f, callBack=callBack)
+        return True
+            
 class FileDownloaderError(Exception):
-    pass
+    def __init(self, message=''):
+        self.message = message
