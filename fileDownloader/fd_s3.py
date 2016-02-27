@@ -97,8 +97,7 @@ AMAZON_HEADER_PREFIX = 'x-amz-'
 
 
     
-AWSAccessKeyId = "AKIAI5EQIIMTQPZTM4DQ"
-AWSSecretAccessKey = "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"
+
 
 key = 'La_Boheme_Roh_2013_Part_2_1-78_MPEG-2-Fe.mpg'
 #url = "ep-features.s3.amazonaws.com/"+urllib.quote(key)
