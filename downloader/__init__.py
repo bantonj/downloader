@@ -73,7 +73,7 @@ class Download:
         if not self.download_path:  # if no filename given pulls filename from the url
             self.download_path = self.get_url_filename()
 
-    def __downloadFile__(self, url_obj, file_obj, call_back=None):
+    def __download_file(self, url_obj, file_obj, call_back=None):
         """starts the download loop"""
         if not self.fast_start:
             self.fileSize = self.get_url_file_size()
@@ -84,7 +84,7 @@ class Download:
                     continue
             try:
                 data = url_obj.read(8192)
-            except (socket.timeout, socket.error) as t:
+            except(socket.timeout, socket.error) as t:
                 print("caught ", t)
                 self.__retry()
                 break
@@ -108,24 +108,24 @@ class Download:
 
     def __auth_http(self):
         """handles http basic authentication"""
-        passman = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+        pass_man = urllib.request.HTTPPasswordMgrWithDefaultRealm()
         # this creates a password manager
-        passman.add_password(None, self.url, self.auth[0], self.auth[1])
+        pass_man.add_password(None, self.url, self.auth[0], self.auth[1])
         # because we have put None at the start it will always
         # use this username/password combination for  urls
-        authhandler = urllib.request.HTTPBasicAuthHandler(passman)
+        auth_handler = urllib.request.HTTPBasicAuthHandler(pass_man)
         # create the AuthHandler
-        opener = urllib.request.build_opener(authhandler)
+        opener = urllib.request.build_opener(auth_handler)
         urllib.request.install_opener(opener)
 
     def __auth_ftp(self):
         """handles ftp authentication"""
-        ftped = urllib.request.FTPHandler()
+        ftp_handler = urllib.request.FTPHandler()
         ftp_url = self.url.replace('ftp://', '')
         req = urllib.request.Request(
             "ftp://%s:%s@%s" % (self.auth[0], self.auth[1], ftp_url))
         req.timeout = self.timeout
-        ftp_obj = ftped.ftp_open(req)
+        ftp_obj = ftp_handler.ftp_open(req)
         return ftp_obj
 
     def __start_http_partial(self, startPos, endPos, callBack=None):
@@ -135,9 +135,9 @@ class Download:
         req = urllib.request.Request(self.url)
         req.headers['Range'] = 'bytes=%s-%s' % (startPos, endPos)
         urllib2_obj = urllib.request.urlopen(req, timeout=self.timeout)
-        self.__downloadFile__(urllib2_obj, f, call_back=callBack)
+        self.__download_file(urllib2_obj, f, call_back=callBack)
 
-    def __start_http_resume(self, restart=None, callBack=None):
+    def __start_http_resume(self, restart=None, call_back=None):
         """starts to resume HTTP"""
         cur_size = self.get_local_file_size()
         if cur_size >= self.url_file_size:
@@ -153,7 +153,7 @@ class Download:
         req.headers['Range'] = 'bytes=%s-%s' % (cur_size,
                                                 self.get_url_file_size())
         urllib2_obj = urllib.request.urlopen(req, timeout=self.timeout)
-        self.__downloadFile__(urllib2_obj, f, call_back=callBack)
+        self.__download_file(urllib2_obj, f, call_back=call_back)
 
     def __start_ftp_resume(self, restart=None):
         """starts to resume FTP"""
@@ -195,7 +195,7 @@ class Download:
                 self.__auth_http()
             urllib2_obj = urllib.request.urlopen(self.url, timeout=self.timeout)
             size = urllib2_obj.headers.get('content-length')
-            return size
+            return int(size)
 
     def get_local_file_size(self):
         """gets file size of local file"""
@@ -237,21 +237,21 @@ class Download:
                 self.__auth_http()
                 urllib2_obj = urllib.request.urlopen(
                     self.url, timeout=self.timeout)
-                self.__downloadFile__(urllib2_obj, f, call_back=call_back)
+                self.__download_file(urllib2_obj, f, call_back=call_back)
             elif self.type == 'ftp':
                 self.url = self.url.replace('ftp://', '')
                 auth_obj = self.__auth_ftp()
-                self.__downloadFile__(auth_obj, f, call_back=call_back)
+                self.__download_file(auth_obj, f, call_back=call_back)
         else:
             urllib2_obj = urllib.request.urlopen(self.url, timeout=self.timeout)
-            self.__downloadFile__(urllib2_obj, f, call_back=call_back)
+            self.__download_file(urllib2_obj, f, call_back=call_back)
         return True
 
     def resume(self, call_back=None):
         """attempts to resume file download"""
         url_type = self.get_type()
         if url_type == 'http':
-            self.__start_http_resume(callBack=call_back)
+            self.__start_http_resume(call_back=call_back)
         elif url_type == 'ftp':
             self.__start_ftp_resume()
 
