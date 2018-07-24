@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 setup(name='file-downloader', 
-		version='0.5.0',
+		version='0.5.1',
 		description="Downloads files via HTTP or FTP",
         packages = find_packages(exclude="test"),
 		long_description="""Intro
@@ -15,22 +15,22 @@ If a non-standard port is needed just include it in the url (http://example.com:
 
     Simple
 
-              downloader = fileDownloader.DownloadFile('http://example.com/file.zip')
+              downloader = downloader.Download('http://example.com/file.zip')
               downloader.download()
 
     Use full path to download
 
-             downloader = fileDownloader.DownloadFile('http://example.com/file.zip', "C:\\Users\\username\\Downloads\\newfilename.zip")
+             downloader = downloader.Download('http://example.com/file.zip', "/Users/username/Downloads/newfilename.zip")
              downloader.download()
 
     Password protected download
 
-             downloader = fileDownloader.DownloadFile('http://example.com/file.zip', "C:\\Users\\username\\Downloads\\newfilename.zip", ('username','password'))
+             downloader = downloader.Download('http://example.com/file.zip', "/Users/username/Downloads/newfilename.zip", ('username','password'))
              downloader.download()
 
     Resume
 
-             downloader = fileDownloader.DownloadFile('http://example.com/file.zip')
+             downloader = downloader.Download('http://example.com/file.zip')
              downloader.resume()""",
 		classifiers=[
         "Programming Language :: Python :: 3",

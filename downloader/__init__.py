@@ -9,7 +9,6 @@ import urllib.request, urllib.parse, urllib.error
 import socket
 from time import time, sleep
 
-version = "0.5.0"
 name = "file-downloader"
 
 
