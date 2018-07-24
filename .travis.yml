@@ -1,0 +1,7 @@
+language: python
+
+jobs:
+  include:
+    - stage: test
+      script:
+        - python3 tests.py
