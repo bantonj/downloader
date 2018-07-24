@@ -8,9 +8,4 @@ python:
     - "3.7"
 
 install: echo "Nothing needed to install"
-
-jobs:
-  include:
-    - stage: test
-      script:
-        - python3 tests.py
+script: python3 tests.py
