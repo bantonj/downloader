@@ -10,6 +10,7 @@ import socket
 from time import time, sleep
 
 version = "0.5.0"
+name = "file-downloader"
 
 
 class Download:

@@ -2,3 +2,6 @@
 *__pycache__
 .DS_STORE
 *.bak
+dist/
+build/
+*.egg-info/

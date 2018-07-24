@@ -6,19 +6,25 @@ The main advantage of this class is it's ease of use, and pure pythoness. It onl
 
 NOTE: This module is now Python 3 only!!!
 
-#####
-If a non-standard port is needed just include it in the url (http://example.com:7632).
+##Installation:
+pip install file-downloader
 
-Basic usage:
-    Simple
-        downloader = downloader.Download('http://example.com/file.zip')
-        downloader.download()
-     Use full path to download
-         downloader = downloader.Download('http://example.com/file.zip', "C:/Users/username/Downloads/newfilename.zip")
-         downloader.download()
-     Basic Authentication protected download
-         downloader = downloader.Download('http://example.com/file.zip', "C:/Users/username/Downloads/newfilename.zip", ('username','password'))
-         downloader.download()
-     Resume
-         downloader = downloader.Download('http://example.com/file.zip')
-        downloader.resume()
+##Basic usage:
+Simple
+
+    downloader = downloader.Download('http://example.com/file.zip')
+    downloader.download()
+ Use full path to download
+
+     downloader = downloader.Download('http://example.com/file.zip', "C:/Users/username/Downloads/newfilename.zip")
+     downloader.download()
+ Basic Authentication protected download
+
+     downloader = downloader.Download('http://example.com/file.zip', "C:/Users/username/Downloads/newfilename.zip", ('username','password'))
+     downloader.download()
+ Resume
+
+    downloader = downloader.Download('http://example.com/file.zip')
+    downloader.resume()
+
+####If a non-standard port is needed just include it in the url (http://example.com:7632).
