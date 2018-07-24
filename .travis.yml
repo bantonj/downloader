@@ -1,0 +1,11 @@
+language: python
+
+python:
+    - "3.3"
+    - "3.4"
+    - "3.5"
+    - "3.6"
+#    - "3.7" disabled until travis adds proper support
+
+install: echo "Nothing needed to install"
+script: python3 tests.py

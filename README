@@ -1,23 +1,24 @@
-This class is used for downloading files from the internet via http or ftp.
+This module is used for downloading files from the internet via http or ftp.
 It supports basic http authentication and ftp accounts, and supports resuming downloads. 
 It does not support https or sftp at this time.
 
-The main advantage of this class is it's ease of use, and pure pythoness. It only uses the Python standard library, 
-so no dependencies to deal with, and no C to compile.
+The main advantage of this class is it's ease of use, and pure pythoness. It only uses the Python standard library.
+
+NOTE: This module is now Python 3 only!!!
 
 #####
 If a non-standard port is needed just include it in the url (http://example.com:7632).
 
 Basic usage:
     Simple
-        downloader = fileDownloader.DownloadFile('http://example.com/file.zip')
+        downloader = downloader.Download('http://example.com/file.zip')
         downloader.download()
      Use full path to download
-         downloader = fileDownloader.DownloadFile('http://example.com/file.zip', "C:/Users/username/Downloads/newfilename.zip")
+         downloader = downloader.Download('http://example.com/file.zip', "C:/Users/username/Downloads/newfilename.zip")
          downloader.download()
      Basic Authentication protected download
-         downloader = fileDownloader.DownloadFile('http://example.com/file.zip', "C:/Users/username/Downloads/newfilename.zip", ('username','password'))
+         downloader = downloader.Download('http://example.com/file.zip', "C:/Users/username/Downloads/newfilename.zip", ('username','password'))
          downloader.download()
      Resume
-         downloader = fileDownloader.DownloadFile('http://example.com/file.zip')
+         downloader = downloader.Download('http://example.com/file.zip')
         downloader.resume()
