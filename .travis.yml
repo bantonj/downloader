@@ -1,5 +1,14 @@
 language: python
 
+python:
+    - "3.3"
+    - "3.4"
+    - "3.5"
+    - "3.6"
+    - "3.7"
+
+install: echo "Nothing needed to install"
+
 jobs:
   include:
     - stage: test
