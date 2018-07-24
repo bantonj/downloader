@@ -1,8 +1,7 @@
 from setuptools import setup, find_packages
-setup(name='fileDownloader.py', 
-		version='0.4.0',
+setup(name='file-downloader', 
+		version='0.5.0',
 		description="Downloads files via HTTP or FTP",
-		download_url="http://code.google.com/p/filedownload/downloads/list",
         packages = find_packages(exclude="test"),
 		long_description="""Intro
 
@@ -34,11 +33,12 @@ If a non-standard port is needed just include it in the url (http://example.com:
              downloader = fileDownloader.DownloadFile('http://example.com/file.zip')
              downloader.resume()""",
 		classifiers=[
-		"Programming Language :: Python",
-		("Topic :: Software Development :: Libraries :: Python Modules"),
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
 		],
 		keywords='download',
 		author='Joshua Banton',
 		author_email='bantonj@gmail.com',
-		url='http://bantonj.wordpress.com/software/open-source/',
+		url='https://github.com/bantonj/downloader',
 		license='MIT')
