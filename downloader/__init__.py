@@ -84,7 +84,7 @@ class Download:
                     continue
             try:
                 data = url_obj.read(8192)
-            except(socket.timeout, socket.error) as t:
+            except (socket.timeout, socket.error) as t:
                 print("caught ", t)
                 self.__retry()
                 break
@@ -181,7 +181,9 @@ class Download:
         down_cmd = "RETR " + file_name
         ftper.retrbinary(down_cmd, f.write)
 
-    def enable_rate_limit(self, rate_burst=500, rate_limit=1000):
+    def enable_rate_limit(self, rate_burst=9000, rate_limit=1000):
+        if rate_burst < 8192:
+            raise TokenBucketError("rate_burst must be > 8192")
         self.rate_limit_bucket = TokenBucket(rate_burst, rate_limit)
 
     def get_url_filename(self):
@@ -193,7 +195,8 @@ class Download:
         if self.type == 'http':
             if self.auth:
                 self.__auth_http()
-            urllib2_obj = urllib.request.urlopen(self.url, timeout=self.timeout)
+            urllib2_obj = urllib.request.urlopen(
+                self.url, timeout=self.timeout)
             size = urllib2_obj.headers.get('content-length')
             return int(size)
 
@@ -212,20 +215,14 @@ class Download:
         if self.auth:
             if self.type == 'http':
                 self.__auth_http()
-                try:
-                    urllib.request.urlopen(self.url, timeout=self.timeout)
-                except urllib.error.HTTPError:
-                    return False
-                return True
-            elif self.type == 'ftp':
-                return "not yet supported"
-        else:
+        elif self.type == 'ftp':
+            return "not yet supported"
+        try:
             urllib.request.urlopen(self.url, timeout=self.timeout)
-            try:
-                urllib.request.urlopen(self.url, timeout=self.timeout)
-            except urllib.error.HTTPError:
-                return False
-            return True
+        except urllib.error.HTTPError:
+            return False
+        return True
+            
 
     def download(self, call_back=None):
         """starts the file download"""
@@ -243,7 +240,8 @@ class Download:
                 auth_obj = self.__auth_ftp()
                 self.__download_file(auth_obj, f, call_back=call_back)
         else:
-            urllib2_obj = urllib.request.urlopen(self.url, timeout=self.timeout)
+            urllib2_obj = urllib.request.urlopen(
+                self.url, timeout=self.timeout)
             self.__download_file(urllib2_obj, f, call_back=call_back)
         return True
 
@@ -296,3 +294,8 @@ class TokenBucket:
             self._tokens = min(self.capacity, self._tokens + delta)
         self.timestamp = now
         return self._tokens
+
+
+class TokenBucketError(Exception):
+    def __init__(self, message=''):
+        self.message = message
