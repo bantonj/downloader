@@ -75,6 +75,27 @@ class TestHttpDownload(unittest.TestCase):
         exists = down.check_exists()
         self.assertFalse(exists)
 
+    def test_ftp_download(self):
+        down = downloader.Download("ftp://speedtest.tele2.net/512KB.zip")
+        self.files.append("512KB.zip")
+        down.download()
+        assert os.path.exists("512KB.zip")
+        assert calculate_md5("512KB.zip") == "59071590099d21dd439896592338bf95"
+
+    def test_ftp_download_password(self):
+        down = downloader.Download("ftp://test.rebex.net/readme.txt", auth=("demo", "password"))
+        self.files.append("readme.txt")
+        down.download()
+        assert os.path.exists("readme.txt")
+        assert calculate_md5("readme.txt") == "d1f2b721bf97a3b6ae0c7975f5a0a11b"
+
+    def test_ftp_download_wrong_password(self):
+        down = downloader.Download("ftp://test.rebex.net/readme.txt", auth=("demo", "wrong"))
+        self.files.append("readme.txt")
+        with self.assertRaises(downloader.urllib.error.URLError) as context:
+            down.download()
+        self.assertTrue('User cannot log in.' in str(context.exception))
+
     def tearDown(self):
         for file in self.files:
             try:

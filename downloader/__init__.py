@@ -129,13 +129,13 @@ class Download:
         return ftp_obj
 
     def __start_http_partial(self, startPos, endPos, callBack=None):
-        f = open(self.download_path, "wb")
-        if self.auth:
-            self.__auth_http()
-        req = urllib.request.Request(self.url)
-        req.headers['Range'] = 'bytes=%s-%s' % (startPos, endPos)
-        urllib2_obj = urllib.request.urlopen(req, timeout=self.timeout)
-        self.__download_file(urllib2_obj, f, call_back=callBack)
+        with open(self.download_path, "wb") as f:
+            if self.auth:
+                self.__auth_http()
+            req = urllib.request.Request(self.url)
+            req.headers['Range'] = 'bytes=%s-%s' % (startPos, endPos)
+            urllib2_obj = urllib.request.urlopen(req, timeout=self.timeout)
+            self.__download_file(urllib2_obj, f, call_back=callBack)
 
     def __start_http_resume(self, restart=None, call_back=None):
         """starts to resume HTTP"""
@@ -228,22 +228,22 @@ class Download:
         """starts the file download"""
         self.cur_retry = 0
         self.cur = 0
-        f = open(self.download_path, "wb")
-        if self.auth:
-            if self.type == 'http':
-                self.__auth_http()
+        with open(self.download_path, "wb") as f:
+            if self.auth:
+                if self.type == 'http':
+                    self.__auth_http()
+                    urllib2_obj = urllib.request.urlopen(
+                        self.url, timeout=self.timeout)
+                    self.__download_file(urllib2_obj, f, call_back=call_back)
+                elif self.type == 'ftp':
+                    self.url = self.url.replace('ftp://', '')
+                    auth_obj = self.__auth_ftp()
+                    self.__download_file(auth_obj, f, call_back=call_back)
+            else:
                 urllib2_obj = urllib.request.urlopen(
                     self.url, timeout=self.timeout)
                 self.__download_file(urllib2_obj, f, call_back=call_back)
-            elif self.type == 'ftp':
-                self.url = self.url.replace('ftp://', '')
-                auth_obj = self.__auth_ftp()
-                self.__download_file(auth_obj, f, call_back=call_back)
-        else:
-            urllib2_obj = urllib.request.urlopen(
-                self.url, timeout=self.timeout)
-            self.__download_file(urllib2_obj, f, call_back=call_back)
-        return True
+            return True
 
     def resume(self, call_back=None):
         """attempts to resume file download"""
