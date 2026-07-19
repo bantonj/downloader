@@ -192,7 +192,7 @@ class Download:
 
     def get_url_file_size(self):
         """gets file size of remote file from ftp or http server"""
-        if self.type == 'http':
+        if self.type in ('http', 'https'):
             if self.auth:
                 self.__auth_http()
             urllib2_obj = urllib.request.urlopen(
